@@ -1,7 +1,9 @@
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
 
+-- ==========================================
 -- 1. Setup ScreenGui (Paling Depan / Topmost)
+-- ==========================================
 local gui = Instance.new("ScreenGui")
 gui.Name = "Zeutron_LoadingUI_vmax"
 gui.DisplayOrder = 999999 
@@ -9,7 +11,9 @@ gui.ResetOnSpawn = false
 gui.IgnoreGuiInset = true
 gui.Parent = game:GetService("CoreGui")
 
+-- ==========================================
 -- 2. Main Frame (Premium Dark Gradient)
+-- ==========================================
 local mainFrame = Instance.new("Frame")
 mainFrame.Name = "MainFrame"
 mainFrame.Size = UDim2.new(0, 480, 0, 380)
@@ -35,7 +39,9 @@ stroke.Thickness = 1.5
 stroke.Transparency = 0.6
 stroke.Parent = mainFrame
 
+-- ==========================================
 -- 3. Ambient Particles (Cyber Dust)
+-- ==========================================
 local particle = Instance.new("ParticleEmitter")
 particle.Color = ColorSequence.new(Color3.fromRGB(0, 255, 136), Color3.fromRGB(0, 100, 50))
 particle.Lifetime = NumberRange.new(3, 5)
@@ -47,7 +53,9 @@ particle.Size = NumberSequence.new(4, 8, 0)
 particle.ZOffset = 5
 particle.Parent = mainFrame
 
--- 4. Header: "CHECKING" (Neon Green)
+-- ==========================================
+-- 4. Header & Version Badge
+-- ==========================================
 local checkingLabel = Instance.new("TextLabel")
 checkingLabel.Size = UDim2.new(0, 220, 0, 50)
 checkingLabel.Position = UDim2.new(0, 25, 0, 20)
@@ -60,7 +68,6 @@ checkingLabel.TextXAlignment = Enum.TextXAlignment.Left
 checkingLabel.TextStrokeTransparency = 0.8
 checkingLabel.Parent = mainFrame
 
--- 5. Version Badge (Futuristic Pill)
 local versionBadge = Instance.new("Frame")
 versionBadge.Size = UDim2.new(0, 110, 0, 32)
 versionBadge.Position = UDim2.new(1, -135, 0, 24)
@@ -80,7 +87,9 @@ versionText.Font = Enum.Font.GothamBlack
 versionText.TextSize = 18
 versionText.Parent = versionBadge
 
--- 6. Progress Bar
+-- ==========================================
+-- 5. Progress Bar
+-- ==========================================
 local progressBg = Instance.new("Frame")
 progressBg.Size = UDim2.new(1, -50, 0, 6)
 progressBg.Position = UDim2.new(0, 25, 0, 75)
@@ -98,7 +107,9 @@ local barCorner = Instance.new("UICorner")
 barCorner.CornerRadius = UDim.new(1, 0) 
 barCorner.Parent = progressBar
 
--- 7. Log Container (Sleek Scrolling)
+-- ==========================================
+-- 6. Log Container (Sleek Scrolling)
+-- ==========================================
 local logContainer = Instance.new("ScrollingFrame")
 logContainer.Size = UDim2.new(1, -50, 0, 200)
 logContainer.Position = UDim2.new(0, 25, 0, 95)
@@ -124,16 +135,316 @@ padding.PaddingBottom = UDim.new(0, 10)
 padding.PaddingLeft = UDim.new(0, 12)
 padding.Parent = logContainer
 
--- 8. Continue Button (Glowing & Animated)
+-- ==========================================
+-- 7. DROPDOWN SCRIPT & EXECUTE BUTTON (REFINED)
+-- ==========================================
+local availableScripts = {
+	{ name = "🎮 Automatic Picker", url = "https://raw.githubusercontent.com/zeutronxsite/Checking/refs/heads/main/reworked" },
+	{ name = "🛠️ TLK Prison", url = "https://raw.githubusercontent.com/IOERHUB/CheckingV2/refs/heads/main/Protection" },
+	{ name = "🎯 Area 51 Remake", url = "https://raw.githubusercontent.com/zeutronxsite/Area-51-Remake/refs/heads/main/Latest%20Version" },
+	{ name = "🚗 Jailbreak", url = "https://raw.githubusercontent.com/zeutronxsite/Jailbreakz/refs/heads/main/Working" },
+	{ name = "🔪 Violence District", url = "https://raw.githubusercontent.com/zeutronxsite/ViolenceDisrict/refs/heads/main/Working" },
+	{ name = "🔥 Power Incremental", url = "https://raw.githubusercontent.com/IOERHUB/Power-Incremental/refs/heads/main/Working" }
+}
+
+local selectedScriptUrl = availableScripts[1].url
+local selectedScriptName = availableScripts[1].name
+local isDropdownOpen = false
+local dropdownItems = {}
+local filteredScripts = {}
+
+-- [A] Dropdown Button Container
+local dropdownContainer = Instance.new("Frame")
+dropdownContainer.Size = UDim2.new(0, 210, 0, 48)
+dropdownContainer.Position = UDim2.new(0, 20, 1, -70)
+dropdownContainer.BackgroundColor3 = Color3.fromRGB(15, 15, 18)
+dropdownContainer.BackgroundTransparency = 0.3
+dropdownContainer.BorderSizePixel = 0
+dropdownContainer.Parent = mainFrame
+
+local dropCorner = Instance.new("UICorner")
+dropCorner.CornerRadius = UDim.new(0, 10)
+dropCorner.Parent = dropdownContainer
+
+local dropStroke = Instance.new("UIStroke")
+dropStroke.Color = Color3.fromRGB(0, 255, 136)
+dropStroke.Thickness = 1.5
+dropStroke.Transparency = 0.6
+dropStroke.Parent = dropdownContainer
+
+-- Dropdown Button (Clickable Area)
+local dropdownBtn = Instance.new("TextButton")
+dropdownBtn.Size = UDim2.new(1, 0, 1, 0)
+dropdownBtn.BackgroundTransparency = 1
+dropdownBtn.Text = ""
+dropdownBtn.ZIndex = 5
+dropdownBtn.Parent = dropdownContainer
+
+-- Text Label untuk nama script (kiri)
+local scriptNameLabel = Instance.new("TextLabel")
+scriptNameLabel.Size = UDim2.new(1, -30, 1, 0)
+scriptNameLabel.Position = UDim2.new(0, 12, 0, 0)
+scriptNameLabel.BackgroundTransparency = 1
+scriptNameLabel.Text = "" .. selectedScriptName
+scriptNameLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+scriptNameLabel.Font = Enum.Font.GothamBold
+scriptNameLabel.TextSize = 15
+scriptNameLabel.TextXAlignment = Enum.TextXAlignment.Left
+scriptNameLabel.TextTruncate = Enum.TextTruncate.AtEnd
+scriptNameLabel.ZIndex = 6
+scriptNameLabel.Parent = dropdownBtn
+
+-- Arrow Label (kanan, fixed position)
+local arrowLabel = Instance.new("TextLabel")
+arrowLabel.Size = UDim2.new(0, 24, 1, 0)
+arrowLabel.Position = UDim2.new(1, -28, 0, 0)
+arrowLabel.BackgroundTransparency = 1
+arrowLabel.Text = "▼"
+arrowLabel.TextColor3 = Color3.fromRGB(0, 255, 136)
+arrowLabel.Font = Enum.Font.GothamBold
+arrowLabel.TextSize = 14
+arrowLabel.TextXAlignment = Enum.TextXAlignment.Center
+arrowLabel.ZIndex = 6
+arrowLabel.Parent = dropdownBtn
+
+-- [B] Dropdown List (ScrollingFrame)
+local dropdownList = Instance.new("ScrollingFrame")
+dropdownList.Size = UDim2.new(0, 210, 0, 0)
+dropdownList.Position = UDim2.new(0, 20, 1, -22)
+dropdownList.BackgroundColor3 = Color3.fromRGB(10, 10, 12)
+dropdownList.BackgroundTransparency = 0.1
+dropdownList.BorderSizePixel = 0
+dropdownList.ZIndex = 20
+dropdownList.Visible = false
+dropdownList.CanvasSize = UDim2.new(0, 0, 0, 0)
+dropdownList.ScrollBarThickness = 4
+dropdownList.ScrollBarImageColor3 = Color3.fromRGB(0, 255, 136)
+dropdownList.ScrollBarImageTransparency = 0.3
+dropdownList.TopImage = "rbxasset://textures/ui/Scroll/scroll-middle.png"
+dropdownList.BottomImage = "rbxasset://textures/ui/Scroll/scroll-middle.png"
+dropdownList.MidImage = "rbxasset://textures/ui/Scroll/scroll-middle.png"
+dropdownList.Parent = mainFrame
+
+local listCorner = Instance.new("UICorner")
+listCorner.CornerRadius = UDim.new(0, 10)
+listCorner.Parent = dropdownList
+
+local listStroke = Instance.new("UIStroke")
+listStroke.Color = Color3.fromRGB(0, 255, 136)
+listStroke.Thickness = 1.5
+listStroke.Transparency = 0.4
+listStroke.ZIndex = 21
+listStroke.Parent = dropdownList
+
+local dropListLayout = Instance.new("UIListLayout")
+dropListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+dropListLayout.Padding = UDim.new(0, 2)
+dropListLayout.Parent = dropdownList
+
+local listPadding = Instance.new("UIPadding")
+listPadding.PaddingTop = UDim.new(0, 8)
+listPadding.PaddingBottom = UDim.new(0, 8)
+listPadding.PaddingLeft = UDim.new(0, 8)
+listPadding.PaddingRight = UDim.new(0, 8)
+listPadding.Parent = dropdownList
+
+-- [C] Search Bar (Refined)
+local searchBar = Instance.new("Frame")
+searchBar.Size = UDim2.new(1, 0, 0, 32)
+searchBar.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
+searchBar.BorderSizePixel = 0
+searchBar.ZIndex = 25
+searchBar.Parent = dropdownList
+
+local searchCorner = Instance.new("UICorner")
+searchCorner.CornerRadius = UDim.new(0, 6)
+searchCorner.Parent = searchBar
+
+local searchStroke = Instance.new("UIStroke")
+searchStroke.Color = Color3.fromRGB(0, 255, 136)
+searchStroke.Thickness = 1
+searchStroke.Transparency = 0.5
+searchStroke.ZIndex = 26
+searchStroke.Parent = searchBar
+
+-- Search Icon (Fixed di kiri)
+local searchIcon = Instance.new("TextLabel")
+searchIcon.Size = UDim2.new(0, 28, 1, 0)
+searchIcon.Position = UDim2.new(0, 4.7, 0.1, 0)
+searchIcon.BackgroundTransparency = 1
+searchIcon.Text = "🔍"
+searchIcon.TextSize = 13
+searchIcon.TextColor3 = Color3.fromRGB(150, 150, 150)
+searchIcon.ZIndex = 27
+searchIcon.Parent = searchBar
+
+-- Search Input (Menempel dengan icon)
+local searchInput = Instance.new("TextBox")
+searchInput.Size = UDim2.new(1, -38, 1, 0)
+searchInput.Position = UDim2.new(0, 34, 0, 0)
+searchInput.BackgroundTransparency = 1
+searchInput.Text = ""
+searchInput.PlaceholderText = "Search script..."
+searchInput.PlaceholderColor3 = Color3.fromRGB(100, 100, 100)
+searchInput.TextColor3 = Color3.fromRGB(220, 220, 220)
+searchInput.Font = Enum.Font.Gotham
+searchInput.TextSize = 13
+searchInput.TextXAlignment = Enum.TextXAlignment.Left
+searchInput.ZIndex = 27
+searchInput.ClearTextOnFocus = false
+searchInput.Parent = searchBar
+
+-- Populate Items
+local function createDropdownItems()
+	for _, item in ipairs(dropdownItems) do
+		if item and item.Parent then
+			item:Destroy()
+		end
+	end
+	dropdownItems = {}
+	
+	for i, scriptData in ipairs(filteredScripts) do
+		local item = Instance.new("TextButton")
+		item.Name = "DropdownItem"
+		item.Size = UDim2.new(1, 0, 0, 34)
+		item.BackgroundTransparency = 1
+		item.BackgroundColor3 = Color3.fromRGB(0, 255, 136)
+		item.Text = scriptData.name
+		item.TextColor3 = Color3.fromRGB(200, 200, 200)
+		item.Font = Enum.Font.Gotham
+		item.TextSize = 14
+		item.TextXAlignment = Enum.TextXAlignment.Left
+		item.TextTruncate = Enum.TextTruncate.AtEnd
+		item.ZIndex = 22
+		item.Visible = true
+		item.Parent = dropdownList
+		
+		local itemPadding = Instance.new("UIPadding")
+		itemPadding.PaddingLeft = UDim.new(0, 10)
+		itemPadding.Parent = item
+		
+		local itemCorner = Instance.new("UICorner")
+		itemCorner.CornerRadius = UDim.new(0, 6)
+		itemCorner.Parent = item
+
+		table.insert(dropdownItems, item)
+
+		item.MouseEnter:Connect(function()
+			item.BackgroundTransparency = 0.2
+			item.TextColor3 = Color3.fromRGB(10, 10, 12)
+		end)
+		
+		item.MouseLeave:Connect(function()
+			item.BackgroundTransparency = 1
+			item.TextColor3 = Color3.fromRGB(200, 200, 200)
+		end)
+
+		item.MouseButton1Click:Connect(function()
+			selectedScriptUrl = scriptData.url
+			selectedScriptName = scriptData.name
+			scriptNameLabel.Text = "" .. selectedScriptName
+			closeDropdown()
+		end)
+	end
+	
+	task.wait()
+	dropdownList.CanvasSize = UDim2.new(0, 0, 0, dropListLayout.AbsoluteContentSize.Y + 48)
+end
+
+-- Search functionality
+searchInput:GetPropertyChangedSignal("Text"):Connect(function()
+	local query = searchInput.Text:lower()
+	filteredScripts = {}
+	
+	for _, scriptData in ipairs(availableScripts) do
+		if scriptData.name:lower():find(query) then
+			table.insert(filteredScripts, scriptData)
+		end
+	end
+	
+	createDropdownItems()
+end)
+
+-- Fungsi Buka/Tutup
+local function openDropdown()
+	isDropdownOpen = true
+	dropdownList.Visible = true
+	
+	searchInput.Text = ""
+	filteredScripts = {}
+	for _, s in ipairs(availableScripts) do
+		table.insert(filteredScripts, s)
+	end
+	
+	createDropdownItems()
+	
+	local totalHeight = math.min(200, (#filteredScripts * 36) + 48)
+	TweenService:Create(dropdownList, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+		Size = UDim2.new(0, 210, 0, totalHeight),
+		Position = UDim2.new(0, 20, 1, -22)
+	}):Play()
+end
+
+local function closeDropdown()
+	isDropdownOpen = false
+	
+	TweenService:Create(dropdownList, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+		Size = UDim2.new(0, 210, 0, 0),
+		Position = UDim2.new(0, 20, 1, -22)
+	}):Play()
+	
+	task.spawn(function()
+		task.wait(0.25)
+		if not isDropdownOpen then
+			dropdownList.Visible = false
+			for _, item in ipairs(dropdownItems) do
+				if item and item.Parent then
+					item.Visible = false
+				end
+			end
+		end
+	end)
+end
+
+dropdownBtn.MouseButton1Click:Connect(function()
+	if isDropdownOpen then
+		closeDropdown()
+	else
+		openDropdown()
+	end
+end)
+
+-- Tutup jika klik di luar
+UserInputService.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 and isDropdownOpen then
+		local mousePos = UserInputService:GetMouseLocation()
+		local listPos = dropdownList.AbsolutePosition
+		local listSize = dropdownList.AbsoluteSize
+		local btnPos = dropdownContainer.AbsolutePosition
+		local btnSize = dropdownContainer.AbsoluteSize
+		
+		local inList = mousePos.X >= listPos.X and mousePos.X <= listPos.X + listSize.X and
+		               mousePos.Y >= listPos.Y and mousePos.Y <= listPos.Y + listSize.Y
+		local inBtn = mousePos.X >= btnPos.X and mousePos.X <= btnPos.X + btnSize.X and
+		              mousePos.Y >= btnPos.Y and mousePos.Y <= btnPos.Y + btnSize.Y
+		              
+		if not inList and not inBtn then
+			closeDropdown()
+		end
+	end
+end)
+
+-- [D] Execute Button
 local continueBtn = Instance.new("TextButton")
-continueBtn.Size = UDim2.new(0, 240, 0, 48)
-continueBtn.Position = UDim2.new(0.5, -120, 1, -70)
+continueBtn.Size = UDim2.new(0, 210, 0, 48)
+continueBtn.Position = UDim2.new(0, 250, 1, -70)
 continueBtn.BackgroundColor3 = Color3.fromRGB(0, 255, 136)
-continueBtn.Text = "INITIALIZE SCRIPT"
+continueBtn.Text = "⏩ EXECUTE"
 continueBtn.TextColor3 = Color3.fromRGB(10, 10, 12)
 continueBtn.Font = Enum.Font.GothamBlack
 continueBtn.TextSize = 20
 continueBtn.Visible = false
+continueBtn.ZIndex = 5
 continueBtn.Parent = mainFrame
 
 local btnCorner = Instance.new("UICorner")
@@ -143,17 +454,41 @@ btnCorner.Parent = continueBtn
 continueBtn.MouseEnter:Connect(function()
 	if not UserInputService.TouchEnabled then
 		TweenService:Create(continueBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(100, 255, 180)}):Play()
-		TweenService:Create(continueBtn, TweenInfo.new(0.2), {Size = UDim2.new(0, 250, 0, 50)}):Play()
-	end
-end)
-continueBtn.MouseLeave:Connect(function()
-	if not UserInputService.TouchEnabled then
-		TweenService:Create(continueBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(0, 255, 136)}):Play()
-		TweenService:Create(continueBtn, TweenInfo.new(0.2), {Size = UDim2.new(0, 240, 0, 48)}):Play()
 	end
 end)
 
--- 9. PERBAIKAN LOGIKA DRAGGING (ANTI-BUG)
+continueBtn.MouseLeave:Connect(function()
+	if not UserInputService.TouchEnabled then
+		TweenService:Create(continueBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(0, 255, 136)}):Play()
+	end
+end)
+
+continueBtn.MouseButton1Click:Connect(function()
+	continueBtn.Interactable = false
+	continueBtn.Text = "⏳ RUNNING..."
+	
+	TweenService:Create(mainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+		Position = UDim2.new(0.5, -240, 0.5, -300), 
+		BackgroundTransparency = 1
+	}):Play()
+	TweenService:Create(stroke, TweenInfo.new(0.3), {Transparency = 1}):Play()
+	
+	task.wait(0.3)
+	gui:Destroy()
+	task.wait(0.1)
+	
+	local success, err = pcall(function()
+		loadstring(game:HttpGet(selectedScriptUrl))()
+	end)
+	
+	if not success then
+		warn("[ERROR] Failed to execute: " .. tostring(err))
+	end
+end)
+
+-- ==========================================
+-- 8. PERBAIKAN LOGIKA DRAGGING (ANTI-BUG)
+-- ==========================================
 local dragging = false
 local dragStart = Vector2.new(0, 0)
 local startPos = UDim2.new(0, 0, 0, 0)
@@ -183,21 +518,22 @@ UserInputService.InputChanged:Connect(function(input)
 end)
 
 -- ==========================================
--- 10. AUTO-COLORING LOG SYSTEM (RICHTEXT)
+-- 9. AUTO-COLORING LOG SYSTEM (RICHTEXT)
 -- ==========================================
 local tagColors = {
-	["[SYSTEM]"]   = Color3.fromRGB(0, 170, 255),   -- Biru
-	["[DEVICE]"]   = Color3.fromRGB(0, 255, 136),   -- Hijau Neon
-	["[INPUT]"]    = Color3.fromRGB(255, 200, 0),    -- Kuning/Amber
-	["[SECURITY]"] = Color3.fromRGB(255, 60, 60),   -- Merah
-	["[CORE]"]     = Color3.fromRGB(180, 0, 255),   -- Ungu
-	["[VERSION]"]  = Color3.fromRGB(0, 229, 255),   -- Cyan
-	["[NETWORK]"]  = Color3.fromRGB(255, 140, 0),   -- Oranye
-	["[LICENSE]"]  = Color3.fromRGB(255, 0, 170),   -- Magenta/Pink
-	["[EXECUTOR]"] = Color3.fromRGB(0, 255, 200),   -- Hijau Mint
-	["[SUPPORT]"]  = Color3.fromRGB(200, 200, 255), -- Lavender/Putih Kebiruan
-	["[WARNING]"]  = Color3.fromRGB(255, 165, 0),   -- Oranye Kuning
-	["[ERROR]"]    = Color3.fromRGB(255, 0, 0)      -- Merah Terang
+	["[SYSTEM]"]   = Color3.fromRGB(0, 170, 255),
+	["[DEVICE]"]   = Color3.fromRGB(0, 255, 136),
+	["[INPUT]"]    = Color3.fromRGB(255, 200, 0),
+	["[SECURITY]"] = Color3.fromRGB(255, 60, 60),
+	["[CORE]"]     = Color3.fromRGB(180, 0, 255),
+	["[VERSION"]   = Color3.fromRGB(0, 229, 255),
+	["[NETWORK]"]  = Color3.fromRGB(255, 140, 0),
+	["[LICENSE]"]  = Color3.fromRGB(255, 0, 170),
+	["[EXECUTOR]"] = Color3.fromRGB(0, 255, 200),
+	["[SUPPORT]"]  = Color3.fromRGB(200, 200, 255),
+	["[WARNING]"]  = Color3.fromRGB(255, 165, 0),
+	["[ERROR]"]    = Color3.fromRGB(255, 0, 0),
+	["[INFO]"]     = Color3.fromRGB(123, 63, 0)
 }
 
 local function colorToHex(color)
@@ -205,31 +541,27 @@ local function colorToHex(color)
 end
 
 local function addLog(text)
-	local tag = text:match("^%b[]") -- Mencocokkan tag di awal seperti [SYSTEM]
+	local tag = text:match("^%b[]")
 	local richText = text
 	
-	-- Jika ada tag dan warnanya terdaftar di tabel
 	if tag and tagColors[tag] then
 		local hexColor = colorToHex(tagColors[tag])
-		-- Format RichText: Tag berwarna, teks sisanya putih terang
 		richText = string.format('<font color="%s">%s</font><font color="#E0E0E0">%s</font>', hexColor, tag, text:sub(#tag + 1))
 	else
-		-- Jika tidak ada tag, teks berwarna putih terang
 		richText = string.format('<font color="#E0E0E0">%s</font>', text)
 	end
 
 	local logLabel = Instance.new("TextLabel")
 	logLabel.Size = UDim2.new(1, -24, 0, 24)
 	logLabel.BackgroundTransparency = 1
-	logLabel.RichText = true -- Mengaktifkan RichText untuk warna berbeda dalam 1 baris
+	logLabel.RichText = true
 	logLabel.Text = richText
-	logLabel.Font = Enum.Font.Code -- Font terminal/hacker
+	logLabel.Font = Enum.Font.Code
 	logLabel.TextSize = 15
 	logLabel.TextXAlignment = Enum.TextXAlignment.Left
 	logLabel.TextTransparency = 1
 	logLabel.Parent = logContainer
 	
-	-- Animasi Slide & Fade In
 	logLabel.Position = UDim2.new(0, -20, 0, 0)
 	TweenService:Create(logLabel, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
 		TextTransparency = 0,
@@ -246,7 +578,9 @@ local function updateProgress(percent)
 	}):Play()
 end
 
--- 11. Checking Sequence
+-- ==========================================
+-- 10. Checking Sequence
+-- ==========================================
 local isMobile = UserInputService.TouchEnabled and not UserInputService.MouseEnabled
 local isPC = UserInputService.MouseEnabled and not UserInputService.TouchEnabled
 
@@ -279,20 +613,14 @@ local function runChecks()
 		updateProgress(90)
 		task.wait(0.2)
 		addLog("[WARNING] Support module: ❌")
-		updateProgress(100)
+		updateProgress(99)
 		task.wait(0.3)
-		addLog("[SYSTEM] Check complete, Click Continue")
+		addLog("[SYSTEM] Checking complete!")
+		task.wait(0.2)
+		addLog("[INFO] Select script & click Execute")
+		updateProgress(100)
 		
-		continueBtn.Text = "⏩ CONTINUE"
 		continueBtn.Visible = true
-		
-		continueBtn.MouseButton1Click:Connect(function()
-			TweenService:Create(mainFrame, TweenInfo.new(0.3), {Position = UDim2.new(0.5, -240, 0.5, -300), BackgroundTransparency = 1}):Play()
-			task.wait(0.3)
-			gui:Destroy()
-			task.wait(0.1)
-			loadstring(game:HttpGet("https://raw.githubusercontent.com/zeutronxsite/Checking/refs/heads/main/reworked"))()
-		end)
 		
 	elseif isPC then
 		addLog("[DEVICE] PC/Computer detected!")
@@ -318,20 +646,14 @@ local function runChecks()
 		updateProgress(90)
 		task.wait(0.2)
 		addLog("[SUPPORT] Premium support module: ✅")
-		updateProgress(100)
+		updateProgress(99)
 		task.wait(0.3)
-		addLog("[SYSTEM] Check complete, Click Continue")
+		addLog("[SYSTEM] Checking complete!")
+		task.wait(0.2)
+		addLog("[INFO] Select script & click Execute")
+		updateProgress(100)
 		
-		continueBtn.Text = "⏩ CONTINUE"
 		continueBtn.Visible = true
-		
-		continueBtn.MouseButton1Click:Connect(function()
-			TweenService:Create(mainFrame, TweenInfo.new(0.3), {Position = UDim2.new(0.5, -240, 0.5, -300), BackgroundTransparency = 1}):Play()
-			task.wait(0.3)
-			gui:Destroy()
-			task.wait(0.1)
-			loadstring(game:HttpGet("https://raw.githubusercontent.com/zeutronxsite/Checking/refs/heads/main/reworked"))()
-		end)
 	else
 		addLog("[ERROR] Unknown device environment!")
 	end
