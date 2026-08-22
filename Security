@@ -140,6 +140,7 @@ padding.Parent = logContainer
 -- ==========================================
 local availableScripts = {
 	{ name = "🎮 Automatic Picker", url = "https://raw.githubusercontent.com/zeutronxsite/Checking/refs/heads/main/reworked" },
+	{ name = "👑 Zeutron Hub", url = "https://raw.githubusercontent.com/Zyptrue/Release/refs/heads/main/New%20Interface" },
 	{ name = "🛠️ TLK Prison", url = "https://raw.githubusercontent.com/IOERHUB/CheckingV2/refs/heads/main/Protection" },
 	{ name = "🎯 Area 51 Remake", url = "https://raw.githubusercontent.com/zeutronxsite/Area-51-Remake/refs/heads/main/Latest%20Version" },
 	{ name = "🚗 Jailbreak", url = "https://raw.githubusercontent.com/zeutronxsite/Jailbreakz/refs/heads/main/Working" },
