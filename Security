@@ -452,16 +452,13 @@ local btnCorner = Instance.new("UICorner")
 btnCorner.CornerRadius = UDim.new(0, 10)
 btnCorner.Parent = continueBtn
 
+-- Hover effects (Khusus PC / Mouse)
 continueBtn.MouseEnter:Connect(function()
-	if not UserInputService.TouchEnabled then
-		TweenService:Create(continueBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(100, 255, 180)}):Play()
-	end
+	TweenService:Create(continueBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(100, 255, 180)}):Play()
 end)
 
 continueBtn.MouseLeave:Connect(function()
-	if not UserInputService.TouchEnabled then
-		TweenService:Create(continueBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(0, 255, 136)}):Play()
-	end
+	TweenService:Create(continueBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(0, 255, 136)}):Play()
 end)
 
 continueBtn.MouseButton1Click:Connect(function()
@@ -488,14 +485,14 @@ continueBtn.MouseButton1Click:Connect(function()
 end)
 
 -- ==========================================
--- 8. PERBAIKAN LOGIKA DRAGGING (ANTI-BUG)
+-- 8. LOGIKA DRAGGING (KHUSUS PC / MOUSE)
 -- ==========================================
 local dragging = false
 local dragStart = Vector2.new(0, 0)
 local startPos = UDim2.new(0, 0, 0, 0)
 
 mainFrame.InputBegan:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
 		dragging = true
 		dragStart = input.Position
 		startPos = mainFrame.Position
@@ -503,13 +500,13 @@ mainFrame.InputBegan:Connect(function(input)
 end)
 
 UserInputService.InputEnded:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
 		dragging = false
 	end
 end)
 
 UserInputService.InputChanged:Connect(function(input)
-	if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+	if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
 		local delta = input.Position - dragStart
 		mainFrame.Position = UDim2.new(
 			startPos.X.Scale, startPos.X.Offset + delta.X,
@@ -527,7 +524,7 @@ local tagColors = {
 	["[INPUT]"]    = Color3.fromRGB(255, 200, 0),
 	["[SECURITY]"] = Color3.fromRGB(255, 60, 60),
 	["[CORE]"]     = Color3.fromRGB(180, 0, 255),
-	["[VERSION"]   = Color3.fromRGB(0, 229, 255),
+	["[VERSION]"]  = Color3.fromRGB(0, 229, 255),
 	["[NETWORK]"]  = Color3.fromRGB(255, 140, 0),
 	["[LICENSE]"]  = Color3.fromRGB(255, 0, 170),
 	["[EXECUTOR]"] = Color3.fromRGB(0, 255, 200),
@@ -580,84 +577,44 @@ local function updateProgress(percent)
 end
 
 -- ==========================================
--- 10. Checking Sequence
+-- 10. Checking Sequence (KHUSUS PC)
 -- ==========================================
-local isMobile = UserInputService.TouchEnabled and not UserInputService.MouseEnabled
-local isPC = UserInputService.MouseEnabled and not UserInputService.TouchEnabled
-
 local function runChecks()
 	addLog("[SYSTEM] Initializing core modules...")
 	updateProgress(10)
 	task.wait(0.3)
 	
-	if isMobile then
-		addLog("[DEVICE] Mobile/Phone detected!")
-		updateProgress(20)
-		task.wait(0.2)
-		addLog("[INPUT] TouchScreen API: ✅")
-		updateProgress(30)
-		task.wait(0.2)
-		addLog("[SECURITY] Bypassing mobile restrictions...")
-		task.wait(0.3)
-		addLog("[CORE] Script Status: ✅")
-		updateProgress(50)
-		task.wait(0.2)
-		addLog("[VERSION] V-Max | Zeutronxsite")
-		updateProgress(60)
-		task.wait(0.2)
-		addLog("[NETWORK] Checking license server...")
-		task.wait(0.4)
-		addLog("[LICENSE] Authentication: ✅")
-		updateProgress(80)
-		task.wait(0.2)
-		addLog("[EXECUTOR] Compatibility: 98%")
-		updateProgress(90)
-		task.wait(0.2)
-		addLog("[WARNING] Support module: ❌")
-		updateProgress(99)
-		task.wait(0.3)
-		addLog("[SYSTEM] Checking complete!")
-		task.wait(0.2)
-		addLog("[INFO] Select script & click Execute")
-		updateProgress(100)
-		
-		continueBtn.Visible = true
-		
-	elseif isPC then
-		addLog("[DEVICE] PC/Computer detected!")
-		updateProgress(20)
-		task.wait(0.2)
-		addLog("[INPUT] Mouse/Keyboard API: ✅")
-		updateProgress(30)
-		task.wait(0.2)
-		addLog("[SECURITY] Scanning for hooks...")
-		task.wait(0.3)
-		addLog("[CORE] Script Status: ✅")
-		updateProgress(50)
-		task.wait(0.2)
-		addLog("[VERSION] V-Max | Zeutronxsite")
-		updateProgress(60)
-		task.wait(0.2)
-		addLog("[NETWORK] Checking license server...")
-		task.wait(0.4)
-		addLog("[LICENSE] Authentication: ✅")
-		updateProgress(80)
-		task.wait(0.2)
-		addLog("[EXECUTOR] Compatibility: 100%")
-		updateProgress(90)
-		task.wait(0.2)
-		addLog("[SUPPORT] Premium support module: ✅")
-		updateProgress(99)
-		task.wait(0.3)
-		addLog("[SYSTEM] Checking complete!")
-		task.wait(0.2)
-		addLog("[INFO] Select script & click Execute")
-		updateProgress(100)
-		
-		continueBtn.Visible = true
-	else
-		addLog("[ERROR] Unknown device environment!")
-	end
+	addLog("[DEVICE] PC/Computer detected!")
+	updateProgress(20)
+	task.wait(0.2)
+	addLog("[INPUT] Mouse/Keyboard API: ✅")
+	updateProgress(30)
+	task.wait(0.2)
+	addLog("[SECURITY] Scanning for hooks...")
+	task.wait(0.3)
+	addLog("[CORE] Script Status: ✅")
+	updateProgress(50)
+	task.wait(0.2)
+	addLog("[VERSION] V-Auto | By Zeutronxsite")
+	updateProgress(60)
+	task.wait(0.2)
+	addLog("[NETWORK] Checking license server...")
+	task.wait(0.4)
+	addLog("[LICENSE] Authentication: ✅")
+	updateProgress(80)
+	task.wait(0.2)
+	addLog("[EXECUTOR] Compatibility: 100%")
+	updateProgress(90)
+	task.wait(0.2)
+	addLog("[SUPPORT] Premium support module: ✅")
+	updateProgress(99)
+	task.wait(0.3)
+	addLog("[SYSTEM] Checking complete!")
+	task.wait(1)
+	addLog("[INFO] Select script & click Execute")
+	updateProgress(100)
+	
+	continueBtn.Visible = true
 end
 
 -- Animasi masuk UI
@@ -676,3 +633,431 @@ strokeTween:Play()
 
 task.wait(0.5)
 task.spawn(runChecks)
+
+
+-- ==========================================
+-- SETTINGS PANEL (With Scripts Button & ZETHUB Toggle)
+-- ==========================================
+local RunService = game:GetService("RunService")
+local TweenService = game:GetService("TweenService")
+local HttpService = game:GetService("HttpService")
+
+-- Warna default UI
+local currentThemeColor = Color3.fromRGB(0, 255, 136) -- Hijau default
+local currentDarkColor = Color3.fromRGB(30, 30, 35)
+local currentDarkerColor = Color3.fromRGB(20, 20, 25)
+
+-- ==========================================
+-- 2. Settings Button
+-- ==========================================
+local settingsBtn = Instance.new("TextButton")
+settingsBtn.Name = "SettingsBtn"
+settingsBtn.Size = UDim2.new(0, 70, 0, 36)
+settingsBtn.Position = UDim2.new(0, 265, 0, 22)
+settingsBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
+settingsBtn.Text = "⚙️"
+settingsBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
+settingsBtn.Font = Enum.Font.GothamBold
+settingsBtn.TextSize = 14
+settingsBtn.TextWrapped = true
+settingsBtn.ZIndex = 10
+settingsBtn.Parent = mainFrame
+
+local settingsBtnCorner = Instance.new("UICorner")
+settingsBtnCorner.CornerRadius = UDim.new(0, 6)
+settingsBtnCorner.Parent = settingsBtn
+
+local settingsBtnStroke = Instance.new("UIStroke")
+settingsBtnStroke.Color = Color3.fromRGB(100, 100, 100)
+settingsBtnStroke.Thickness = 1
+settingsBtnStroke.Transparency = 0.5
+settingsBtnStroke.Parent = settingsBtn
+
+-- ==========================================
+-- 3. Settings Panel
+-- ==========================================
+local settingsPanel = Instance.new("Frame")
+settingsPanel.Name = "SettingsPanel"
+settingsPanel.Size = UDim2.new(0, 320, 0, 280)
+settingsPanel.Position = UDim2.new(0.5, 260, 0.5, -140)
+settingsPanel.BorderSizePixel = 0
+settingsPanel.Visible = false
+settingsPanel.ClipsDescendants = true
+settingsPanel.Parent = gui
+
+local settingsGradient = Instance.new("UIGradient")
+settingsGradient.Color = ColorSequence.new({
+	ColorSequenceKeypoint.new(0, currentDarkColor),
+	ColorSequenceKeypoint.new(1, currentDarkerColor)
+})
+settingsGradient.Rotation = 135
+settingsGradient.Parent = settingsPanel
+
+local settingsCorner = Instance.new("UICorner")
+settingsCorner.CornerRadius = UDim.new(0, 14)
+settingsCorner.Parent = settingsPanel
+
+local settingsStroke = Instance.new("UIStroke")
+settingsStroke.Color = currentThemeColor
+settingsStroke.Thickness = 1.5
+settingsStroke.Transparency = 0.4
+settingsStroke.Parent = settingsPanel
+
+-- Settings Header
+local settingsHeader = Instance.new("TextLabel")
+settingsHeader.Size = UDim2.new(1, -50, 0, 40)
+settingsHeader.Position = UDim2.new(0, 0, 0, 10)
+settingsHeader.BackgroundTransparency = 1
+settingsHeader.Text = "Settings Panel"
+settingsHeader.TextColor3 = Color3.fromRGB(255, 255, 255)
+settingsHeader.Font = Enum.Font.GothamBold
+settingsHeader.TextSize = 22
+settingsHeader.TextXAlignment = Enum.TextXAlignment.Center
+settingsHeader.Parent = settingsPanel
+
+-- Close Button (X)
+local closeSettingsBtn = Instance.new("TextButton")
+closeSettingsBtn.Size = UDim2.new(0, 36, 0, 36)
+closeSettingsBtn.Position = UDim2.new(1, -44, 0, 12)
+closeSettingsBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
+closeSettingsBtn.Text = "X"
+closeSettingsBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
+closeSettingsBtn.Font = Enum.Font.GothamBold
+closeSettingsBtn.TextSize = 16
+closeSettingsBtn.ZIndex = 10
+closeSettingsBtn.Parent = settingsPanel
+
+local closeBtnCorner = Instance.new("UICorner")
+closeBtnCorner.CornerRadius = UDim.new(0, 6)
+closeBtnCorner.Parent = closeSettingsBtn
+
+closeSettingsBtn.MouseEnter:Connect(function()
+	TweenService:Create(closeSettingsBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(255, 60, 60)}):Play()
+	closeSettingsBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+end)
+
+closeSettingsBtn.MouseLeave:Connect(function()
+	TweenService:Create(closeSettingsBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(40, 40, 45)}):Play()
+	closeSettingsBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
+end)
+
+-- Separator Line
+local separator = Instance.new("Frame")
+separator.Size = UDim2.new(1, -20, 0, 2)
+separator.Position = UDim2.new(0, 10, 0, 55)
+separator.BackgroundColor3 = currentThemeColor
+separator.BackgroundTransparency = 0.6
+separator.Parent = settingsPanel
+
+local sepCorner = Instance.new("UICorner")
+sepCorner.CornerRadius = UDim.new(1, 0)
+sepCorner.Parent = separator
+
+-- Settings Options Container
+local settingsOptions = Instance.new("Frame")
+settingsOptions.Size = UDim2.new(1, -30, 0, 200)
+settingsOptions.Position = UDim2.new(0, 15, 0, 70)
+settingsOptions.BackgroundTransparency = 1
+settingsOptions.Parent = settingsPanel
+
+local settingsListLayout = Instance.new("UIListLayout")
+settingsListLayout.Padding = UDim.new(0, 12)
+settingsListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+settingsListLayout.Parent = settingsOptions
+
+-- Helper function untuk membuat setting row
+local function createSettingRow(name, optionType, parent)
+	local row = Instance.new("Frame")
+	row.Size = UDim2.new(1, 0, 0, 44)
+	row.BackgroundColor3 = Color3.fromRGB(35, 35, 40)
+	row.BackgroundTransparency = 0.3
+	row.BorderSizePixel = 0
+	row.Parent = parent
+	row.ClipsDescendants = true
+	
+	local rowCorner = Instance.new("UICorner")
+	rowCorner.CornerRadius = UDim.new(0, 8)
+	rowCorner.Parent = row
+	
+	local rowStroke = Instance.new("UIStroke")
+	rowStroke.Color = Color3.fromRGB(60, 60, 65)
+	rowStroke.Thickness = 1
+	rowStroke.Parent = row
+	
+	local label = Instance.new("TextLabel")
+	label.Size = UDim2.new(0.58, 0, 1, 0)
+	label.Position = UDim2.new(0, 12, 0, 0)
+	label.BackgroundTransparency = 1
+	label.Text = name
+	label.TextColor3 = Color3.fromRGB(220, 220, 220)
+	label.Font = Enum.Font.Gotham
+	label.TextSize = 15
+	label.TextXAlignment = Enum.TextXAlignment.Left
+	label.TextTruncate = Enum.TextTruncate.AtEnd
+	label.Parent = row
+	
+	local optionBtn = Instance.new("TextButton")
+	optionBtn.Size = UDim2.new(0.38, 0, 0.7, 0)
+	optionBtn.Position = UDim2.new(0.60, 0, 0.15, 0)
+	optionBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 55)
+	optionBtn.Text = optionType
+	optionBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
+	optionBtn.Font = Enum.Font.GothamBold
+	optionBtn.TextSize = 13
+	optionBtn.TextTruncate = Enum.TextTruncate.AtEnd
+	optionBtn.Parent = row
+	
+	local optCorner = Instance.new("UICorner")
+	optCorner.CornerRadius = UDim.new(0, 6)
+	optCorner.Parent = optionBtn
+	
+	return row, optionBtn
+end
+
+-- ==========================================
+-- 4. Setting Options
+-- ==========================================
+
+-- Setting 1: Scripts Button (Menggantikan Theme UI)
+local row1 = Instance.new("Frame")
+row1.Size = UDim2.new(1, 0, 0, 44)
+row1.BackgroundColor3 = Color3.fromRGB(35, 35, 40)
+row1.BackgroundTransparency = 0.3
+row1.BorderSizePixel = 0
+row1.Parent = settingsOptions
+row1.ClipsDescendants = true
+
+local row1Corner = Instance.new("UICorner")
+row1Corner.CornerRadius = UDim.new(0, 8)
+row1Corner.Parent = row1
+
+local row1Stroke = Instance.new("UIStroke")
+row1Stroke.Color = Color3.fromRGB(60, 60, 65)
+row1Stroke.Thickness = 1
+row1Stroke.Parent = row1
+
+local scriptsLabel = Instance.new("TextLabel")
+scriptsLabel.Size = UDim2.new(0.58, 0, 1, 0)
+scriptsLabel.Position = UDim2.new(0, 12, 0, 0)
+scriptsLabel.BackgroundTransparency = 1
+scriptsLabel.Text = "Infinite Yield"
+scriptsLabel.TextColor3 = Color3.fromRGB(220, 220, 220)
+scriptsLabel.Font = Enum.Font.Gotham
+scriptsLabel.TextSize = 15
+scriptsLabel.TextXAlignment = Enum.TextXAlignment.Left
+scriptsLabel.Parent = row1
+
+local scriptsBtn = Instance.new("TextButton")
+scriptsBtn.Size = UDim2.new(0.38, 0, 0.7, 0)
+scriptsBtn.Position = UDim2.new(0.60, 0, 0.15, 0)
+scriptsBtn.BackgroundColor3 = currentThemeColor
+scriptsBtn.Text = "Click"
+scriptsBtn.TextColor3 = Color3.fromRGB(10, 10, 12)
+scriptsBtn.Font = Enum.Font.GothamBold
+scriptsBtn.TextSize = 14
+scriptsBtn.Parent = row1
+
+local scriptsCorner = Instance.new("UICorner")
+scriptsCorner.CornerRadius = UDim.new(0, 6)
+scriptsCorner.Parent = scriptsBtn
+
+scriptsBtn.MouseEnter:Connect(function()
+	TweenService:Create(scriptsBtn, TweenInfo.new(0.2), {BackgroundColor3 = currentThemeColor:Lerp(Color3.new(1,1,1), 0.3)}):Play()
+end)
+
+scriptsBtn.MouseLeave:Connect(function()
+	TweenService:Create(scriptsBtn, TweenInfo.new(0.2), {BackgroundColor3 = currentThemeColor}):Play()
+end)
+
+scriptsBtn.MouseButton1Click:Connect(function()
+	print("[SCRIPTS] Loading Infinite Yield...")
+	
+	-- Loading animation
+	scriptsBtn.Text = "Loading..."
+	scriptsBtn.Interactable = false
+	
+	task.spawn(function()
+		local success, err = pcall(function()
+			loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"))()
+		end)
+		
+		if success then
+			scriptsBtn.Text = "Loaded!"
+			task.wait(1)
+			scriptsBtn.Text = "Click"
+			scriptsBtn.Interactable = true
+		else
+			scriptsBtn.Text = "Error!"
+			task.wait(1)
+			scriptsBtn.Text = "Click"
+			scriptsBtn.Interactable = true
+			warn("[SCRIPTS] Failed to load Infinite Yield: " .. tostring(err))
+		end
+	end)
+end)
+
+-- Setting 2: Check FPS
+local row2, checkFpsBtn = createSettingRow("Check FPS", "OFF", settingsOptions)
+local checkFpsEnabled = false
+local fpsLabel = nil
+local fpsConnection = nil
+
+checkFpsBtn.MouseButton1Click:Connect(function()
+	checkFpsEnabled = not checkFpsEnabled
+	checkFpsBtn.Text = checkFpsEnabled and "ON" or "OFF"
+	
+	if checkFpsEnabled then
+		TweenService:Create(checkFpsBtn, TweenInfo.new(0.3), {
+			BackgroundColor3 = currentThemeColor,
+			TextColor3 = Color3.fromRGB(10, 10, 12)
+		}):Play()
+		
+		fpsLabel = Instance.new("TextLabel")
+		fpsLabel.Name = "FPSCounter"
+		fpsLabel.Size = UDim2.new(0, 100, 0, 30)
+		fpsLabel.Position = UDim2.new(0.5, -50, 0, 5)
+		fpsLabel.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+		fpsLabel.BackgroundTransparency = 0.5
+		fpsLabel.Text = "FPS: 60"
+		fpsLabel.TextColor3 = currentThemeColor
+		fpsLabel.Font = Enum.Font.GothamBold
+		fpsLabel.TextSize = 16
+		fpsLabel.ZIndex = 100
+		fpsLabel.Parent = gui
+		
+		local fpsCorner = Instance.new("UICorner")
+		fpsCorner.CornerRadius = UDim.new(0, 6)
+		fpsCorner.Parent = fpsLabel
+		
+		local lastTime = tick()
+		local frameCount = 0
+		fpsConnection = RunService.RenderStepped:Connect(function()
+			frameCount = frameCount + 1
+			local currentTime = tick()
+			if currentTime - lastTime >= 1 then
+				local fps = math.floor(frameCount / (currentTime - lastTime))
+				fpsLabel.Text = "FPS: " .. fps
+				frameCount = 0
+				lastTime = currentTime
+			end
+		end)
+	else
+		TweenService:Create(checkFpsBtn, TweenInfo.new(0.3), {
+			BackgroundColor3 = Color3.fromRGB(50, 50, 55),
+			TextColor3 = Color3.fromRGB(200, 200, 200)
+		}):Play()
+		
+		if fpsLabel then
+			fpsLabel:Destroy()
+			fpsLabel = nil
+		end
+		if fpsConnection then
+			fpsConnection:Disconnect()
+			fpsConnection = nil
+		end
+	end
+end)
+
+-- Setting 3: Destroy UI
+local row3, destroyUiBtn = createSettingRow("Destroy UI", "Click", settingsOptions)
+
+destroyUiBtn.MouseButton1Click:Connect(function()
+	print("[SYSTEM] Destroying UI...")
+	task.wait(0.2)
+	
+	if mainFrame then
+		TweenService:Create(mainFrame, TweenInfo.new(0.3), {
+			Position = UDim2.new(0.5, -240, 0.5, -300),
+			BackgroundTransparency = 1
+		}):Play()
+	end
+	
+	TweenService:Create(settingsPanel, TweenInfo.new(0.3), {
+		Position = UDim2.new(0.5, 260, 0.5, -300),
+		BackgroundTransparency = 1
+	}):Play()
+	
+	if zethubToggle then
+		TweenService:Create(zethubToggle, TweenInfo.new(0.3), {
+			BackgroundTransparency = 1
+		}):Play()
+	end
+	
+	task.wait(0.3)
+	gui:Destroy()
+end)
+
+-- ==========================================
+-- 5. Toggle Settings Panel
+-- ==========================================
+settingsBtn.MouseEnter:Connect(function()
+	TweenService:Create(settingsBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(40, 40, 45)}):Play()
+	settingsBtnStroke.Color = currentThemeColor
+end)
+
+settingsBtn.MouseLeave:Connect(function()
+	if not settingsPanel.Visible then
+		TweenService:Create(settingsBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(30, 30, 35)}):Play()
+		settingsBtnStroke.Color = Color3.fromRGB(100, 100, 100)
+	end
+end)
+
+settingsBtn.MouseButton1Click:Connect(function()
+	settingsPanel.Visible = not settingsPanel.Visible
+	
+	if settingsPanel.Visible then
+		settingsPanel.Position = UDim2.new(0.5, 260, 0.5, -140)
+		settingsPanel.BackgroundTransparency = 1
+		TweenService:Create(settingsPanel, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+			Position = UDim2.new(0.5, 260, 0.5, -140),
+			BackgroundTransparency = 0
+		}):Play()
+		
+		TweenService:Create(settingsBtn, TweenInfo.new(0.2), {BackgroundColor3 = currentThemeColor}):Play()
+		settingsBtn.TextColor3 = Color3.fromRGB(10, 10, 12)
+	else
+		TweenService:Create(settingsPanel, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+			BackgroundTransparency = 1
+		}):Play()
+		
+		TweenService:Create(settingsBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(30, 30, 35)}):Play()
+		settingsBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
+	end
+end)
+
+closeSettingsBtn.MouseButton1Click:Connect(function()
+	settingsPanel.Visible = false
+	TweenService:Create(settingsBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(30, 30, 35)}):Play()
+	settingsBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
+end)
+
+-- ==========================================
+-- 6. Dragging untuk Settings Panel
+-- ==========================================
+local settingsDragging = false
+local settingsDragStart = Vector2.new(0, 0)
+local settingsStartPos = UDim2.new(0, 0, 0, 0)
+
+settingsPanel.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+		settingsDragging = true
+		settingsDragStart = input.Position
+		settingsStartPos = settingsPanel.Position
+	end
+end)
+
+game:GetService("UserInputService").InputEnded:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+		settingsDragging = false
+	end
+end)
+
+game:GetService("UserInputService").InputChanged:Connect(function(input)
+	if settingsDragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+		local delta = input.Position - settingsDragStart
+		settingsPanel.Position = UDim2.new(
+			settingsStartPos.X.Scale, settingsStartPos.X.Offset + delta.X,
+			settingsStartPos.Y.Scale, settingsStartPos.Y.Offset + delta.Y
+		)
+	end
+end)
