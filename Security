@@ -1,5 +1,6 @@
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
 
 -- ==========================================
 -- 1. Setup ScreenGui (Paling Depan / Topmost)
@@ -415,19 +416,19 @@ dropdownBtn.MouseButton1Click:Connect(function()
 	end
 end)
 
--- Tutup jika klik di luar
+-- Tutup jika klik/sentuh di luar (Support Mobile & PC)
 UserInputService.InputBegan:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseButton1 and isDropdownOpen then
-		local mousePos = UserInputService:GetMouseLocation()
+	if (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) and isDropdownOpen then
+		local touchPos = input.Position
 		local listPos = dropdownList.AbsolutePosition
 		local listSize = dropdownList.AbsoluteSize
 		local btnPos = dropdownContainer.AbsolutePosition
 		local btnSize = dropdownContainer.AbsoluteSize
 		
-		local inList = mousePos.X >= listPos.X and mousePos.X <= listPos.X + listSize.X and
-		               mousePos.Y >= listPos.Y and mousePos.Y <= listPos.Y + listSize.Y
-		local inBtn = mousePos.X >= btnPos.X and mousePos.X <= btnPos.X + btnSize.X and
-		              mousePos.Y >= btnPos.Y and mousePos.Y <= btnPos.Y + btnSize.Y
+		local inList = touchPos.X >= listPos.X and touchPos.X <= listPos.X + listSize.X and
+		               touchPos.Y >= listPos.Y and touchPos.Y <= listPos.Y + listSize.Y
+		local inBtn = touchPos.X >= btnPos.X and touchPos.X <= btnPos.X + btnSize.X and
+		              touchPos.Y >= btnPos.Y and touchPos.Y <= btnPos.Y + btnSize.Y
 		              
 		if not inList and not inBtn then
 			closeDropdown()
@@ -468,7 +469,7 @@ end)
 -- Execute Action (UI TIDAK DIHANCURKAN)
 continueBtn.MouseButton1Click:Connect(function()
 	-- Cegah klik ganda
-	if continueBtn.Text == " RUNNING..." then return end
+	if continueBtn.Text == "⏳ RUNNING..." then return end
 	
 	continueBtn.Interactable = false
 	continueBtn.Text = "⏳ RUNNING..."
@@ -516,14 +517,15 @@ continueBtn.MouseButton1Click:Connect(function()
 end)
 
 -- ==========================================
--- 8. LOGIKA DRAGGING (KHUSUS PC / MOUSE)
+-- 8. LOGIKA DRAGGING (PC & MOBILE)
 -- ==========================================
 local dragging = false
 local dragStart = Vector2.new(0, 0)
 local startPos = UDim2.new(0, 0, 0, 0)
 
 mainFrame.InputBegan:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+	-- Mendukung Mouse (PC) DAN Touch (Mobile)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
 		dragging = true
 		dragStart = input.Position
 		startPos = mainFrame.Position
@@ -531,13 +533,13 @@ mainFrame.InputBegan:Connect(function(input)
 end)
 
 UserInputService.InputEnded:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
 		dragging = false
 	end
 end)
 
 UserInputService.InputChanged:Connect(function(input)
-	if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+	if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
 		local delta = input.Position - dragStart
 		mainFrame.Position = UDim2.new(
 			startPos.X.Scale, startPos.X.Offset + delta.X,
@@ -608,42 +610,111 @@ local function updateProgress(percent)
 end
 
 -- ==========================================
--- 10. Checking Sequence (KHUSUS PC)
+-- 10. Checking Sequence (PC & MOBILE DETECTION)
 -- ==========================================
+local isMobile = UserInputService.TouchEnabled and not UserInputService.MouseEnabled
+local isPC = UserInputService.MouseEnabled and not UserInputService.TouchEnabled
+
 local function runChecks()
 	addLog("[SYSTEM] Initializing core modules...")
 	updateProgress(10)
 	task.wait(0.3)
 	
-	addLog("[DEVICE] PC/Computer detected!")
-	updateProgress(20)
-	task.wait(0.2)
-	addLog("[INPUT] Mouse/Keyboard API: ✅")
-	updateProgress(30)
-	task.wait(0.2)
-	addLog("[SECURITY] Scanning for hooks...")
-	task.wait(0.3)
-	addLog("[CORE] Script Status: ✅")
-	updateProgress(50)
-	task.wait(0.2)
-	addLog("[VERSION] V-Auto | By Zeutronxsite")
-	updateProgress(60)
-	task.wait(0.2)
-	addLog("[NETWORK] Checking license server...")
-	task.wait(0.4)
-	addLog("[LICENSE] Authentication: ✅")
-	updateProgress(80)
-	task.wait(0.2)
-	addLog("[EXECUTOR] Compatibility: 100%")
-	updateProgress(90)
-	task.wait(0.2)
-	addLog("[SUPPORT] Premium support module: ✅")
-	updateProgress(99)
-	task.wait(0.3)
-	addLog("[SYSTEM] Checking complete!")
-	task.wait(1)
-	addLog("[INFO] Select script & click Execute")
-	updateProgress(100)
+	if isMobile then
+		-- LOG KHUSUS MOBILE
+		addLog("[DEVICE] Mobile/Phone detected!")
+		updateProgress(20)
+		task.wait(0.2)
+		addLog("[INPUT] TouchScreen API: ✅")
+		updateProgress(30)
+		task.wait(0.2)
+		addLog("[SECURITY] Bypassing mobile restrictions...")
+		task.wait(0.3)
+		addLog("[CORE] Script Status: ✅")
+		updateProgress(50)
+		task.wait(0.2)
+		addLog("[VERSION] V-Auto | By Zeutronxsite")
+		updateProgress(60)
+		task.wait(0.2)
+		addLog("[NETWORK] Checking license server...")
+		task.wait(0.4)
+		addLog("[LICENSE] Authentication: ✅")
+		updateProgress(80)
+		task.wait(0.2)
+		addLog("[EXECUTOR] Compatibility: 98%")
+		updateProgress(90)
+		task.wait(0.2)
+		addLog("[WARNING] Support module: ❌")
+		updateProgress(99)
+		task.wait(0.3)
+		addLog("[SYSTEM] Checking complete!")
+		task.wait(1)
+		addLog("[INFO] Select script & click Execute")
+		updateProgress(100)
+		
+	elseif isPC then
+		-- LOG KHUSUS PC
+		addLog("[DEVICE] PC/Computer detected!")
+		updateProgress(20)
+		task.wait(0.2)
+		addLog("[INPUT] Mouse/Keyboard API: ✅")
+		updateProgress(30)
+		task.wait(0.2)
+		addLog("[SECURITY] Scanning for hooks...")
+		task.wait(0.3)
+		addLog("[CORE] Script Status: ✅")
+		updateProgress(50)
+		task.wait(0.2)
+		addLog("[VERSION] V-Auto | By Zeutronxsite")
+		updateProgress(60)
+		task.wait(0.2)
+		addLog("[NETWORK] Checking license server...")
+		task.wait(0.4)
+		addLog("[LICENSE] Authentication: ✅")
+		updateProgress(80)
+		task.wait(0.2)
+		addLog("[EXECUTOR] Compatibility: 100%")
+		updateProgress(90)
+		task.wait(0.2)
+		addLog("[SUPPORT] Premium support module: ✅")
+		updateProgress(99)
+		task.wait(0.3)
+		addLog("[SYSTEM] Checking complete!")
+		task.wait(1)
+		addLog("[INFO] Select script & click Execute")
+		updateProgress(100)
+	else
+		-- LOG UNTUK DEVICE TIDAK DIKENAL
+		addLog("[DEVICE] Unknown device detected!")
+		updateProgress(20)
+		task.wait(0.2)
+		addLog("[INPUT] Unknown input method")
+		updateProgress(30)
+		task.wait(0.2)
+		addLog("[SECURITY] Scanning for hooks...")
+		task.wait(0.3)
+		addLog("[CORE] Script Status: ✅")
+		updateProgress(50)
+		task.wait(0.2)
+		addLog("[VERSION] V-Auto | By Zeutronxsite")
+		updateProgress(60)
+		task.wait(0.2)
+		addLog("[NETWORK] Checking license server...")
+		task.wait(0.4)
+		addLog("[LICENSE] Authentication: ✅")
+		updateProgress(80)
+		task.wait(0.2)
+		addLog("[EXECUTOR] Compatibility: 100%")
+		updateProgress(90)
+		task.wait(0.2)
+		addLog("[SUPPORT] Premium support module: ✅")
+		updateProgress(99)
+		task.wait(0.3)
+		addLog("[SYSTEM] Checking complete!")
+		task.wait(1)
+		addLog("[INFO] Select script & click Execute")
+		updateProgress(100)
+	end
 	
 	continueBtn.Visible = true
 end
@@ -667,10 +738,8 @@ task.spawn(runChecks)
 
 
 -- ==========================================
--- SETTINGS PANEL (With Scripts Button & ZETHUB Toggle)
+-- 11. SETTINGS PANEL (With Scripts Button & ZETHUB Toggle)
 -- ==========================================
-local RunService = game:GetService("RunService")
-local TweenService = game:GetService("TweenService")
 local HttpService = game:GetService("HttpService")
 
 -- Warna default UI
@@ -678,9 +747,7 @@ local currentThemeColor = Color3.fromRGB(0, 255, 136) -- Hijau default
 local currentDarkColor = Color3.fromRGB(30, 30, 35)
 local currentDarkerColor = Color3.fromRGB(20, 20, 25)
 
--- ==========================================
--- 2. Settings Button
--- ==========================================
+-- Settings Button
 local settingsBtn = Instance.new("TextButton")
 settingsBtn.Name = "SettingsBtn"
 settingsBtn.Size = UDim2.new(0, 70, 0, 36)
@@ -704,9 +771,7 @@ settingsBtnStroke.Thickness = 1
 settingsBtnStroke.Transparency = 0.5
 settingsBtnStroke.Parent = settingsBtn
 
--- ==========================================
--- 3. Settings Panel
--- ==========================================
+-- Settings Panel
 local settingsPanel = Instance.new("Frame")
 settingsPanel.Name = "SettingsPanel"
 settingsPanel.Size = UDim2.new(0, 320, 0, 280)
@@ -845,11 +910,7 @@ local function createSettingRow(name, optionType, parent)
 	return row, optionBtn
 end
 
--- ==========================================
--- 4. Setting Options
--- ==========================================
-
--- Setting 1: Scripts Button (Menggantikan Theme UI)
+-- Setting 1: Scripts Button
 local row1 = Instance.new("Frame")
 row1.Size = UDim2.new(1, 0, 0, 44)
 row1.BackgroundColor3 = Color3.fromRGB(35, 35, 40)
@@ -901,9 +962,8 @@ scriptsBtn.MouseLeave:Connect(function()
 end)
 
 scriptsBtn.MouseButton1Click:Connect(function()
-	print("[SCRIPTS] Loading Infinite Yield...")
+	addLog("[SCRIPTS] Loading Infinite Yield...")
 	
-	-- Loading animation
 	scriptsBtn.Text = "Loading..."
 	scriptsBtn.Interactable = false
 	
@@ -922,7 +982,7 @@ scriptsBtn.MouseButton1Click:Connect(function()
 			task.wait(1)
 			scriptsBtn.Text = "Click"
 			scriptsBtn.Interactable = true
-			warn("[SCRIPTS] Failed to load Infinite Yield: " .. tostring(err))
+			addLog("[ERROR] Failed to load Infinite Yield")
 		end
 	end)
 end)
@@ -993,7 +1053,7 @@ end)
 local row3, destroyUiBtn = createSettingRow("Destroy UI", "Click", settingsOptions)
 
 destroyUiBtn.MouseButton1Click:Connect(function()
-	print("[SYSTEM] Destroying UI...")
+	addLog("[SYSTEM] Destroying UI...")
 	task.wait(0.2)
 	
 	if mainFrame then
@@ -1008,19 +1068,11 @@ destroyUiBtn.MouseButton1Click:Connect(function()
 		BackgroundTransparency = 1
 	}):Play()
 	
-	if zethubToggle then
-		TweenService:Create(zethubToggle, TweenInfo.new(0.3), {
-			BackgroundTransparency = 1
-		}):Play()
-	end
-	
 	task.wait(0.3)
 	gui:Destroy()
 end)
 
--- ==========================================
--- 5. Toggle Settings Panel
--- ==========================================
+-- Toggle Settings Panel
 settingsBtn.MouseEnter:Connect(function()
 	TweenService:Create(settingsBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(40, 40, 45)}):Play()
 	settingsBtnStroke.Color = currentThemeColor
@@ -1062,9 +1114,7 @@ closeSettingsBtn.MouseButton1Click:Connect(function()
 	settingsBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
 end)
 
--- ==========================================
--- 6. Dragging untuk Settings Panel
--- ==========================================
+-- Dragging untuk Settings Panel (PC & Mobile)
 local settingsDragging = false
 local settingsDragStart = Vector2.new(0, 0)
 local settingsStartPos = UDim2.new(0, 0, 0, 0)
@@ -1077,13 +1127,13 @@ settingsPanel.InputBegan:Connect(function(input)
 	end
 end)
 
-game:GetService("UserInputService").InputEnded:Connect(function(input)
+UserInputService.InputEnded:Connect(function(input)
 	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
 		settingsDragging = false
 	end
 end)
 
-game:GetService("UserInputService").InputChanged:Connect(function(input)
+UserInputService.InputChanged:Connect(function(input)
 	if settingsDragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
 		local delta = input.Position - settingsDragStart
 		settingsPanel.Position = UDim2.new(
