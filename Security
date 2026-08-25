@@ -506,7 +506,7 @@ continueBtn.MouseButton1Click:Connect(function()
 		
 		-- Reset tombol setelah 2 detik agar bisa dieksekusi ulang
 		task.wait(2)
-		continueBtn.Text = " EXECUTE"
+		continueBtn.Text = "⏩ EXECUTE"
 		continueBtn.Interactable = true
 		TweenService:Create(continueBtn, TweenInfo.new(0.3), {
 			BackgroundColor3 = Color3.fromRGB(0, 255, 136),
