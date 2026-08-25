@@ -473,8 +473,6 @@ continueBtn.MouseButton1Click:Connect(function()
 	TweenService:Create(stroke, TweenInfo.new(0.3), {Transparency = 1}):Play()
 	
 	task.wait(0.3)
-	gui:Destroy()
-	task.wait(0.1)
 	
 	local success, err = pcall(function()
 		loadstring(game:HttpGet(selectedScriptUrl))()
