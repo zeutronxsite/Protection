@@ -455,32 +455,65 @@ btnCorner.Parent = continueBtn
 
 -- Hover effects (Khusus PC / Mouse)
 continueBtn.MouseEnter:Connect(function()
-	TweenService:Create(continueBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(100, 255, 180)}):Play()
+	if not UserInputService.TouchEnabled then
+		TweenService:Create(continueBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(100, 255, 180)}):Play()
+	end
 end)
 
 continueBtn.MouseLeave:Connect(function()
-	TweenService:Create(continueBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(0, 255, 136)}):Play()
+	if not UserInputService.TouchEnabled then
+		TweenService:Create(continueBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(0, 255, 136)}):Play()
+	end
 end)
 
+-- Execute Action (UI TIDAK DIHANCURKAN)
 continueBtn.MouseButton1Click:Connect(function()
+	-- Cegah klik ganda
+	if continueBtn.Text == " RUNNING..." then return end
+	
 	continueBtn.Interactable = false
 	continueBtn.Text = "⏳ RUNNING..."
 	
-	TweenService:Create(mainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
-		Position = UDim2.new(0.5, -240, 0.5, -300), 
-		BackgroundTransparency = 1
+	-- Animasi tombol saat running
+	TweenService:Create(continueBtn, TweenInfo.new(0.3), {
+		BackgroundColor3 = Color3.fromRGB(255, 200, 0),
+		TextSize = 18
 	}):Play()
-	TweenService:Create(stroke, TweenInfo.new(0.3), {Transparency = 1}):Play()
 	
-	task.wait(0.3)
+	task.wait(0.2)
 	
-	local success, err = pcall(function()
-		loadstring(game:HttpGet(selectedScriptUrl))()
+	-- Eksekusi script di thread terpisah agar UI tidak freeze
+	task.spawn(function()
+		local success, err = pcall(function()
+			loadstring(game:HttpGet(selectedScriptUrl))()
+		end)
+		
+		-- Kembalikan tombol ke state semula
+		task.wait(0.5)
+		
+		if success then
+			continueBtn.Text = "✅ EXECUTED"
+			TweenService:Create(continueBtn, TweenInfo.new(0.3), {
+				BackgroundColor3 = Color3.fromRGB(0, 255, 136),
+				TextSize = 20
+			}):Play()
+		else
+			continueBtn.Text = "❌ FAILED"
+			TweenService:Create(continueBtn, TweenInfo.new(0.3), {
+				BackgroundColor3 = Color3.fromRGB(255, 60, 60),
+				TextSize = 20
+			}):Play()
+		end
+		
+		-- Reset tombol setelah 2 detik agar bisa dieksekusi ulang
+		task.wait(2)
+		continueBtn.Text = " EXECUTE"
+		continueBtn.Interactable = true
+		TweenService:Create(continueBtn, TweenInfo.new(0.3), {
+			BackgroundColor3 = Color3.fromRGB(0, 255, 136),
+			TextSize = 20
+		}):Play()
 	end)
-	
-	if not success then
-		warn("[ERROR] Failed to execute: " .. tostring(err))
-	end
 end)
 
 -- ==========================================
